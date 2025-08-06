@@ -1,11 +1,14 @@
 import random
-import pygame
+
+from pygame import Surface
+from pygame.draw import polygon
+from pygame.math import Vector2
 
 from components.game_objects.game_object import GameObject
 
 
 class Asteroid(GameObject):
-    def __init__(self, x, y, size=3) -> None:
+    def __init__(self, x: float, y: float, size: int =3) -> None:
         super().__init__(x, y)
         self.time_now: float = 0.0
         self.size = size
@@ -14,7 +17,7 @@ class Asteroid(GameObject):
 
         speed = random.uniform(50, 150)
         angle = random.uniform(0, 360)
-        self.velocity = pygame.math.Vector2(speed, 0)
+        self.velocity = Vector2(speed, 0)
         self.velocity.rotate_ip(angle)
 
         self.vertices = []
@@ -23,16 +26,16 @@ class Asteroid(GameObject):
             angle = (360 / num_vertices) * i
             radius_variation = random.uniform(0.8, 1.2)
             vertex_radius = self.radius * radius_variation
-            vertex = pygame.math.Vector2(vertex_radius, 0)
+            vertex = Vector2(vertex_radius, 0)
             vertex.rotate_ip(angle)
             self.vertices.append(vertex)
 
-    def update(self, dt, time_now: float):
+    def update(self, dt: float, time_now: float) -> None:
         self.time_now = time_now
         super().update(dt, time_now)
         self.angle += self.rotation_speed * dt
 
-    def draw(self, screen):
+    def draw(self, screen: Surface):
         rotated_vertices = []
         for vertex in self.vertices:
             rotated_vertex = vertex.copy()
@@ -40,9 +43,9 @@ class Asteroid(GameObject):
             rotated_vertex += self.position
             rotated_vertices.append(rotated_vertex)
 
-        pygame.draw.polygon(screen, (100, 100, 100), rotated_vertices, 2)
+        polygon(screen, (100, 100, 100), rotated_vertices, 2)
 
-    def split(self):
+    def split(self) -> 'list[Asteroid]':
         if self.size > 1:
             fragments = []
             for _ in range(2):
@@ -51,7 +54,7 @@ class Asteroid(GameObject):
                     self.position.y,
                     self.size - 1
                 )
-                fragment.velocity += pygame.math.Vector2(
+                fragment.velocity += Vector2(
                     random.uniform(-100, 100),
                     random.uniform(-100, 100)
                 )

@@ -1,7 +1,8 @@
 from time import time
-from typing import Set
 
 import pygame as pg
+from pygame import Surface
+from pygame.time import Clock
 
 from abstractions.apps import AppComponent
 from components.menu import (
@@ -16,8 +17,8 @@ from settings import AppEvents, Settings
 class Main:
     def __init__(self) -> None:
         pg.display.set_caption('Space Miner')
-        self.screen: pg.Surface = pg.display.set_mode(Settings.screen_size)
-        self.clock = pg.time.Clock()
+        self.screen: Surface = pg.display.set_mode(Settings.screen_size)
+        self.clock: Clock = Clock()
 
         self.main_menu: AppComponent = MainMenu(self.screen)
         self.game: AppComponent = Game(self.screen)
@@ -27,21 +28,19 @@ class Main:
         self.current_component: AppComponent = self.main_menu
         self.is_running: bool = True
 
-    def handle_input(self) -> Set[int]:
-        keys_pressed: Set[int] = set()
+    def handle_input(self) -> set[int]:
+        keys_pressed: set[int] = set()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.is_running = False
                 break
 
-            if (
-                event.type == pg.KEYDOWN
-            ):
+            if event.type == pg.KEYDOWN:
                 keys_pressed.add(event.key)
 
         return keys_pressed
 
-    def run(self):
+    def run(self) -> None:
         while self.is_running:
 
             dt = self.clock.tick(60) / 1000.0

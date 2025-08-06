@@ -1,4 +1,6 @@
+from pygame import Surface
 from pygame.draw import circle
+from pygame.math import Vector2
 
 from components.game_objects.game_object import GameObject
 from settings import (
@@ -8,13 +10,13 @@ from settings import (
 
 
 class Bullet(GameObject):
-    def __init__(self, x, y, velocity) -> None:
+    def __init__(self, x: float, y: float, velocity: Vector2) -> None:
         super().__init__(x, y)
         self.time_now: float = 0.0
         self.velocity = velocity
         self.radius: int = 2
 
-    def update(self, dt, time_now: float):
+    def update(self, dt: float, time_now: float) -> None:
         self.time_now = time_now
         self.position += self.velocity * dt
 
@@ -24,7 +26,7 @@ class Bullet(GameObject):
         if self.position.y < 0 or self.position.y > Settings.screen_size_y:
             self.alive = False
 
-    def draw(self, screen):
+    def draw(self, screen: Surface) -> None:
         circle(
             screen,
             Colors.yellow,

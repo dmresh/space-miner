@@ -1,19 +1,17 @@
-
 from abc import ABC, abstractmethod
-from typing import Set
 
-import pygame as pg
+from pygame import Surface
 
 
 class AppComponent(ABC):
     @abstractmethod
-    def __init__(self, screen: pg.Surface) -> None:
-        self.screen: pg.Surface
+    def __init__(self, screen: Surface) -> None:
+        self.screen: Surface
         self.event: str
         self.time_now: float
 
     @abstractmethod
-    def handle_input(self, inputs: Set[int]) -> None:
+    def handle_input(self, inputs: set[int]) -> None:
         pass
 
     @abstractmethod

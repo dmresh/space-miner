@@ -1,6 +1,15 @@
 from typing import Callable
 
-import pygame as pg
+from pygame import (
+    K_DOWN,
+    K_KP_ENTER,
+    K_RETURN,
+    K_UP,
+    Rect,
+    Surface,
+)
+from pygame.draw import rect
+from pygame.font import SysFont
 
 from abstractions.apps import AppComponent
 from settings import (
@@ -19,16 +28,16 @@ class MenuItem:
 
 
 class BaseMenu(AppComponent):
-    def __init__(self, screen: pg.Surface) -> None:
-        self.screen: pg.Surface = screen
+    def __init__(self, screen: Surface) -> None:
+        self.screen: Surface = screen
         self.event: str = ''
         self.time_now: float = 0.0
 
         self.menu_title: str = ''
 
-        self.font = pg.font.SysFont("Arial", 24)
-        self.font_title = pg.font.SysFont("Arial", 62)
-        self.font_small = pg.font.SysFont("Arial", 18)
+        self.font = SysFont("Arial", 24)
+        self.font_title = SysFont("Arial", 62)
+        self.font_small = SysFont("Arial", 18)
 
         self.menu_vertical_shift = 0
         self.sall_text_vertical_shift = Settings.screen_size_y - 100
@@ -56,14 +65,14 @@ class BaseMenu(AppComponent):
 
     def handle_input(self, inputs: set[int]) -> None:
         if (
-            pg.K_RETURN in inputs
-            or pg.K_KP_ENTER in inputs
+            K_RETURN in inputs
+            or K_KP_ENTER in inputs
         ):
             self.menu_items[self.selected_menu_item].action()
 
-        if pg.K_UP in inputs:
+        if K_UP in inputs:
             self.select_next_menu_item()
-        elif pg.K_DOWN in inputs:
+        elif K_DOWN in inputs:
             self.select_prev_menu_item()
 
     def draw_stats(self) -> None:
@@ -96,13 +105,13 @@ class BaseMenu(AppComponent):
         x0 = Settings.screen_center[0] - 300
         y0 = Settings.screen_center[1] - 200
 
-        help_rect = pg.Rect(
+        help_rect = Rect(
                 x0, 
                 y0,
                 600,
                 400,
             )
-        pg.draw.rect(
+        rect(
             self.screen,
             Colors.blue_dark,
             help_rect,
@@ -135,7 +144,7 @@ class BaseMenu(AppComponent):
             self.screen.blit(help_text, help_rect)
             y_offset += int(self.font_small.get_height() * 1.2)
 
-    def draw_title(self):
+    def draw_title(self) -> None:
         title_text = self.font_title.render(
             self.menu_title,
             True,
@@ -147,7 +156,7 @@ class BaseMenu(AppComponent):
         ))
         self.screen.blit(title_text, title_rect)
 
-    def draw_menu(self):
+    def draw_menu(self) -> None:
         self.height: int = (
             self.menu_item_height * len(self.menu_items)
             + self.menu_items_gap * (len(self.menu_items)+1)
@@ -161,11 +170,10 @@ class BaseMenu(AppComponent):
             + self.menu_vertical_shift
             - self.height // 2
         )
-
-        pg.draw.rect(
+        rect(
             self.screen,
             Colors.blue_dark,
-            pg.Rect(self.x0, self.y0, self.width, self.height),
+            Rect(self.x0, self.y0, self.width, self.height),
         )
         for i in range(len(self.menu_items)):
 
@@ -174,7 +182,7 @@ class BaseMenu(AppComponent):
             else:
                 color = Colors.blue
 
-            rect = pg.Rect(
+            menu_item_rect = Rect(
                 self.x0+self.menu_items_padding,
                 (
                     self.y0
@@ -190,15 +198,15 @@ class BaseMenu(AppComponent):
                 True,
                 Colors.gray,
             )
-            text_rect = text.get_rect(center=rect.center)
-            pg.draw.rect(
+            text_rect = text.get_rect(center=menu_item_rect.center)
+            rect(
                 self.screen,
                 color,
-                rect,
+                menu_item_rect,
             )
             self.screen.blit(text, text_rect)
 
-    def draw_help_text(self):
+    def draw_help_text(self) -> None:
         help_text = self.font_small.render(
             'Press "UP" or "DOWN" to select, "ENTER" to activate',
             True,
@@ -229,7 +237,7 @@ class BaseMenu(AppComponent):
 
 
 class MainMenu(BaseMenu):
-    def __init__(self, screen: pg.Surface) -> None:
+    def __init__(self, screen: Surface) -> None:
         super().__init__(screen)
         self.menu_title = 'Space Miner'
         self.menu_items = (
@@ -252,14 +260,14 @@ class MainMenu(BaseMenu):
 
 
 class PauseMenu(MainMenu):
-    def __init__(self, screen: pg.Surface) -> None:
+    def __init__(self, screen: Surface) -> None:
         super().__init__(screen)
         self.menu_items[0].text = 'Resume your game'
         self.is_draw_stats = True
 
 
 class ShopMenu(BaseMenu):
-    def __init__(self, screen: pg.Surface) -> None:
+    def __init__(self, screen: Surface) -> None:
         super().__init__(screen)
         self.menu_title = 'Shop'
         self.menu_item_width = 500
@@ -282,12 +290,12 @@ class ShopMenu(BaseMenu):
     def is_enough_credits(self, cost: int) -> bool:
         return UserStats.credits - cost >= 0
 
-    def increase_max_bullets(self):
+    def increase_max_bullets(self) -> None:
         if self.is_enough_credits(Prices.bullets):
             UserStats.credits -= Prices.bullets
             UserStats.max_bullets += 5
 
-    def increase_lives(self):
+    def increase_lives(self) -> None:
         if self.is_enough_credits(Prices.lives):
             UserStats.credits -= Prices.lives
             UserStats.lives += 1

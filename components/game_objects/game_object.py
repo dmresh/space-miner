@@ -1,10 +1,11 @@
+from pygame import Surface
 from pygame.math import Vector2
 
 from settings import Settings
 
 
 class GameObject:
-    def __init__(self, x: int, y: int):
+    def __init__(self, x: float, y: float):
         self.time_now: float = 0.0
         self.position: Vector2 = Vector2(x, y)
         self.velocity: Vector2 = Vector2(0, 0)
@@ -12,7 +13,7 @@ class GameObject:
         self.radius = 20
         self.alive = True
 
-    def update(self, dt, time_now: float):
+    def update(self, dt: float, time_now: float) -> None:
         self.time_now = time_now
         self.position += self.velocity * dt
 
@@ -25,9 +26,9 @@ class GameObject:
         elif self.position.y > Settings.screen_size_y:
             self.position.y = 0
 
-    def draw(self, screen):
+    def draw(self, screen: Surface) -> None:
         pass
 
-    def check_collision(self, other):
+    def check_collision(self, other: 'GameObject') -> bool:
         distance = self.position.distance_to(other.position)
         return distance < (self.radius + other.radius)

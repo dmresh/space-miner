@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Tuple
 
 
 @dataclass
@@ -15,8 +14,8 @@ class AppEvents:
 class Settings:
     screen_size_x: int = 1400
     screen_size_y: int = 900
-    screen_size: Tuple[int, int] = screen_size_x, screen_size_y
-    screen_center: Tuple[int, int] = screen_size_x // 2, screen_size_y // 2
+    screen_size: tuple[int, int] = screen_size_x, screen_size_y
+    screen_center: tuple[int, int] = screen_size_x // 2, screen_size_y // 2
     asteroids_start_amount: int = 1
 
 

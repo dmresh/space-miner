@@ -1,7 +1,17 @@
 from random import randint
-from typing import List, Set, Tuple
 
-import pygame as pg
+from pygame import (
+    K_ESCAPE,
+    K_LEFT,
+    K_r,
+    K_RIGHT,
+    K_SPACE,
+    K_UP,
+    Surface,
+)
+from pygame.font import SysFont
+from pygame.key import get_pressed
+from pygame.math import Vector2
 
 from abstractions.apps import AppComponent
 from components.game_objects.asteroid import Asteroid
@@ -16,18 +26,18 @@ from settings import AppEvents
 
 
 class Game(AppComponent):
-    def __init__(self, screen: pg.Surface) -> None:
+    def __init__(self, screen: Surface) -> None:
         self.event: str = ''
         self.time_now: float = 0.0
 
         self.screen = screen
-        self.screen_center: Tuple[int, int] = Settings.screen_center
-        self.font = pg.font.SysFont("Arial", 24)
-        self.asteroids: List[Asteroid] = []
+        self.screen_center: tuple[int, int] = Settings.screen_center
+        self.font = SysFont("Arial", 24)
+        self.asteroids: list[Asteroid] = []
         self.asteroids_amount: int = Settings.asteroids_start_amount
 
-        self.current_level = UserStats.level
-        self.game_over = False
+        self.current_level: int = UserStats.level
+        self.game_over: bool = False
 
         self.restart()
         self.generate_ship()
@@ -35,17 +45,16 @@ class Game(AppComponent):
 
     def generate_ship(self) -> None:
         self.ship = Ship(*Settings.screen_center)
-        self.ship.velocity = pg.math.Vector2(0, 0)
+        self.ship.velocity = Vector2(0, 0)
         self.ship_spawned_at: float = self.time_now
 
     def is_place_far_for_ship(self, x: int, y: int) -> bool:
-        place: pg.Vector2 = pg.math.Vector2(x, y)
+        place: Vector2 = Vector2(x, y)
         if (place.distance_to(self.ship.position) > 100):
             return True
         return False
 
-    def generate_asteroids(self):
-        "Generationg asteroids."
+    def generate_asteroids(self) -> None:
         while len(self.asteroids) <= self.asteroids_amount:
             x = randint(0, Settings.screen_size_x)
             y = randint(0, Settings.screen_size_y)
@@ -53,41 +62,40 @@ class Game(AppComponent):
             if self.is_place_far_for_ship(x, y):
                 self.asteroids.append(Asteroid(x, y))
 
-    def go_to_main_menu(self):
+    def go_to_main_menu(self) -> None:
         self.event = AppEvents.go_to_main_menu
 
-    def go_to_pause_menu(self):
+    def go_to_pause_menu(self) -> None:
         self.event = AppEvents.go_to_pause_menu
 
-    def go_to_shop_menu(self):
+    def go_to_shop_menu(self) -> None:
         self.event = AppEvents.go_to_shop_menu
 
-    def handle_input(self, inputs: Set[int]) -> None:
-        keys = pg.key.get_pressed()
+    def handle_input(self, inputs: set[int]) -> None:
+        keys = get_pressed()
 
-        if keys[pg.K_LEFT]:
+        if keys[K_LEFT]:
             self.ship.rotation_speed = -180
-        elif keys[pg.K_RIGHT]:
+        elif keys[K_RIGHT]:
             self.ship.rotation_speed = 180
         else:
             self.ship.rotation_speed = 0
 
-        if keys[pg.K_UP]:
+        if keys[K_UP]:
             self.ship.thrust = 200
         else:
             self.ship.thrust = 0
 
-        if keys[pg.K_SPACE]:
+        if keys[K_SPACE]:
             self.ship.shoot()
 
-        if pg.K_r in inputs:
+        if K_r in inputs:
             self.ship.start_reloading()
 
-        if pg.K_ESCAPE in inputs:
+        if K_ESCAPE in inputs:
             self.go_to_pause_menu()
 
-    def check_collisions_bullets_and_asteroids(self):
-        "Проверка столкновений пуль с астероидами."
+    def check_collisions_bullets_and_asteroids(self) -> None:
         for bullet in self.ship.bullets[:]:
             for asteroid in self.asteroids[:]:
                 if bullet.check_collision(asteroid):
@@ -100,8 +108,7 @@ class Game(AppComponent):
                     self.asteroids.extend(fragments)
                     break
 
-    def check_collisions_ship_and_asteroids(self):
-        "Проверка столкновений корабля с астероидами."
+    def check_collisions_ship_and_asteroids(self) -> None:
         for asteroid in self.asteroids[:]:
             if (
                 self.ship.check_collision(asteroid)
@@ -113,13 +120,11 @@ class Game(AppComponent):
             if UserStats.lives < 1:
                 self.game_over = True
 
-    def check_for_win(self):
-        "Проверка победы (все астероиды уничтожены)."
+    def check_for_win(self) -> None:
         if not self.asteroids:
             self.go_to_shop_menu()
 
-    def start_new_level(self):
-        "Создание нового уровня."
+    def start_new_level(self) -> None:
         self.current_level = UserStats.level
 
         self.generate_ship()
@@ -128,7 +133,7 @@ class Game(AppComponent):
         self.asteroids_amount = 3 * UserStats.level
         self.generate_asteroids()
 
-    def update(self, dt, time_now: float):
+    def update(self, dt: float, time_now: float) -> None:
         self.time_now = time_now
 
         if self.game_over:
@@ -148,7 +153,7 @@ class Game(AppComponent):
         self.check_collisions_ship_and_asteroids()
         self.check_for_win()
 
-    def draw(self):
+    def draw(self) -> None:
         self.screen.fill(Colors.blue_darker)
 
         if not self.game_over:
@@ -200,7 +205,7 @@ class Game(AppComponent):
             )
 
 
-    def restart(self):
+    def restart(self) -> None:
         UserStats.credits = DefaultStats.credits
         UserStats.lives = DefaultStats.lives
         UserStats.level = DefaultStats.level
