@@ -1,17 +1,20 @@
 from time import time
+from typing import TYPE_CHECKING
 
 import pygame as pg
 from pygame import Surface
 from pygame.time import Clock
 
-from abstractions.apps import AppComponent
+from components.game import Game
 from components.menu import (
     MainMenu,
     PauseMenu,
     ShopMenu,
 )
-from components.game import Game
 from settings import AppEvents, Settings
+
+if TYPE_CHECKING:
+    from abstractions.apps import AppComponent
 
 
 class Main:
@@ -52,7 +55,7 @@ class Main:
             pg.display.flip()
 
             event = self.current_component.event
-            self.current_component.event = ''
+            self.current_component.event = AppEvents.no_event
             match event:
                 case AppEvents.quit_the_game:
                     self.is_running = False
@@ -69,6 +72,6 @@ class Main:
         pg.quit()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pg.init()
     Main().run()

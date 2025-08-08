@@ -35,7 +35,7 @@ class Asteroid(GameObject):
         super().update(dt, time_now)
         self.angle += self.rotation_speed * dt
 
-    def draw(self, screen: Surface):
+    def draw(self, screen: Surface) -> None:
         rotated_vertices = []
         for vertex in self.vertices:
             rotated_vertex = vertex.copy()
@@ -52,11 +52,11 @@ class Asteroid(GameObject):
                 fragment = Asteroid(
                     self.position.x,
                     self.position.y,
-                    self.size - 1
+                    self.size - 1,
                 )
                 fragment.velocity += Vector2(
                     random.uniform(-100, 100),
-                    random.uniform(-100, 100)
+                    random.uniform(-100, 100),
                 )
                 fragments.append(fragment)
             return fragments

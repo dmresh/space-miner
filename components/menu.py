@@ -30,17 +30,16 @@ class MenuItem:
 class BaseMenu(AppComponent):
     def __init__(self, screen: Surface) -> None:
         self.screen: Surface = screen
-        self.event: str = ''
+        self.event: AppEvents = AppEvents.no_event
         self.time_now: float = 0.0
 
         self.menu_title: str = ''
 
-        self.font = SysFont("Arial", 24)
-        self.font_title = SysFont("Arial", 62)
-        self.font_small = SysFont("Arial", 18)
+        self.font = SysFont('Arial', 24)
+        self.font_title = SysFont('Arial', 62, True)
+        self.font_small = SysFont('Arial', 18)
 
         self.menu_vertical_shift = 0
-        self.sall_text_vertical_shift = Settings.screen_size_y - 100
         self.menu_items: tuple[MenuItem, ...] = ()
         self.menu_item_height: int = 60
         self.menu_item_width: int = 400
@@ -77,22 +76,22 @@ class BaseMenu(AppComponent):
 
     def draw_stats(self) -> None:
         level_text = self.font.render(
-            f"Level: {UserStats.level}",
+            f'Level: {UserStats.level}',
             True,
             Colors.white,
         )
         score_text = self.font.render(
-            f"Credits: {UserStats.credits}",
+            f'Credits: {UserStats.credits}',
             True,
             Colors.white,
         )
         lives_text = self.font.render(
-            f"Lives: {UserStats.lives}",
+            f'Lives: {UserStats.lives}',
             True,
             Colors.white,
         )
         bullets_text = self.font.render(
-            f"Bullets: {UserStats.max_bullets}",
+            f'Bullets: {UserStats.max_bullets}',
             True,
             Colors.white,
         )
@@ -106,7 +105,7 @@ class BaseMenu(AppComponent):
         y0 = Settings.screen_center[1] - 200
 
         help_rect = Rect(
-                x0, 
+                x0,
                 y0,
                 600,
                 400,
@@ -152,28 +151,28 @@ class BaseMenu(AppComponent):
         )
         title_rect = title_text.get_rect(center=(
             Settings.screen_center[0],
-            100,
+            120,
         ))
         self.screen.blit(title_text, title_rect)
 
     def draw_menu(self) -> None:
-        self.height: int = (
+        height: int = (
             self.menu_item_height * len(self.menu_items)
             + self.menu_items_gap * (len(self.menu_items)+1)
         )
-        self.width: int = (
+        width: int = (
             self.menu_item_width + self.menu_items_gap*2
         )
-        self.x0 = Settings.screen_center[0] - self.width // 2
-        self.y0 = (
+        x0 = Settings.screen_center[0] - width // 2
+        y0 = (
             Settings.screen_center[1]
             + self.menu_vertical_shift
-            - self.height // 2
+            - height // 2
         )
         rect(
             self.screen,
             Colors.blue_dark,
-            Rect(self.x0, self.y0, self.width, self.height),
+            Rect(x0, y0, width, height),
         )
         for i in range(len(self.menu_items)):
 
@@ -183,14 +182,14 @@ class BaseMenu(AppComponent):
                 color = Colors.blue
 
             menu_item_rect = Rect(
-                self.x0+self.menu_items_padding,
+                x0+self.menu_items_padding,
                 (
-                    self.y0
+                    y0
                     + self.menu_items_gap
                     + (i*self.menu_items_gap)
                     + (i*self.menu_item_height)
                 ),
-                self.width-(self.menu_items_padding*2),
+                width-(self.menu_items_padding*2),
                 self.menu_item_height,
             )
             text = self.font.render(
@@ -216,7 +215,7 @@ class BaseMenu(AppComponent):
             center=(
                 Settings.screen_center[0],
                 Settings.screen_size_y-50,
-            )
+            ),
         )
         self.screen.blit(help_text, help_rect)
 
@@ -243,7 +242,7 @@ class MainMenu(BaseMenu):
         self.menu_items = (
             MenuItem('Start new game', self.go_to_game),
             MenuItem('How to play', self.show_how_to_play),
-            MenuItem('Quit', self.quit_app)
+            MenuItem('Quit', self.quit_app),
         )
 
     def go_to_game(self) -> None:
@@ -273,7 +272,7 @@ class ShopMenu(BaseMenu):
         self.menu_item_width = 500
         self.menu_items = (
             MenuItem(
-                f'Buy gun upgrage ({Prices.bullets} cr.)',
+                f'Buy gun upgrade ({Prices.bullets} cr.)',
                 self.increase_max_bullets,
             ),
             MenuItem(
@@ -287,7 +286,8 @@ class ShopMenu(BaseMenu):
         )
         self.is_draw_stats = True
 
-    def is_enough_credits(self, cost: int) -> bool:
+    @staticmethod
+    def is_enough_credits(cost: int) -> bool:
         return UserStats.credits - cost >= 0
 
     def increase_max_bullets(self) -> None:

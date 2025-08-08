@@ -3,10 +3,10 @@ from random import randint
 from pygame import (
     K_ESCAPE,
     K_LEFT,
-    K_r,
     K_RIGHT,
     K_SPACE,
     K_UP,
+    K_r,
     Surface,
 )
 from pygame.font import SysFont
@@ -17,26 +17,28 @@ from abstractions.apps import AppComponent
 from components.game_objects.asteroid import Asteroid
 from components.game_objects.ship import Ship
 from settings import (
-    DefaultStats,
+    AppEvents,
     Colors,
+    DefaultStats,
     Settings,
     UserStats,
 )
-from settings import AppEvents
 
 
 class Game(AppComponent):
     def __init__(self, screen: Surface) -> None:
-        self.event: str = ''
+        self.event: AppEvents = AppEvents.no_event
         self.time_now: float = 0.0
 
         self.screen = screen
         self.screen_center: tuple[int, int] = Settings.screen_center
-        self.font = SysFont("Arial", 24)
+        self.font = SysFont('Arial', 24)
         self.asteroids: list[Asteroid] = []
         self.asteroids_amount: int = Settings.asteroids_start_amount
 
         self.current_level: int = UserStats.level
+        self.ship: Ship = Ship(*Settings.screen_center)
+        self.ship_spawned_at: float = self.time_now
         self.game_over: bool = False
 
         self.restart()
@@ -46,16 +48,14 @@ class Game(AppComponent):
     def generate_ship(self) -> None:
         self.ship = Ship(*Settings.screen_center)
         self.ship.velocity = Vector2(0, 0)
-        self.ship_spawned_at: float = self.time_now
+        self.ship_spawned_at = self.time_now
 
     def is_place_far_for_ship(self, x: int, y: int) -> bool:
         place: Vector2 = Vector2(x, y)
-        if (place.distance_to(self.ship.position) > 100):
-            return True
-        return False
+        return place.distance_to(self.ship.position) > Settings.safe_distance
 
     def generate_asteroids(self) -> None:
-        while len(self.asteroids) <= self.asteroids_amount:
+        while len(self.asteroids) < self.asteroids_amount:
             x = randint(0, Settings.screen_size_x)
             y = randint(0, Settings.screen_size_y)
 
@@ -130,7 +130,7 @@ class Game(AppComponent):
         self.generate_ship()
         self.ship.cur_bullets = UserStats.max_bullets
 
-        self.asteroids_amount = 3 * UserStats.level
+        self.asteroids_amount = 2 * UserStats.level
         self.generate_asteroids()
 
     def update(self, dt: float, time_now: float) -> None:
@@ -163,28 +163,28 @@ class Game(AppComponent):
                 asteroid.draw(self.screen)
 
         level_text = self.font.render(
-            f"Level: {UserStats.level}",
+            f'Level: {UserStats.level}',
             True,
             Colors.white,
         )
         score_text = self.font.render(
-            f"Credits: {UserStats.credits}",
+            f'Credits: {UserStats.credits}',
             True,
             Colors.white,
         )
         lives_text = self.font.render(
-            f"Lives: {UserStats.lives}",
+            f'Lives: {UserStats.lives}',
             True,
             Colors.white,
         )
         bullets_text = self.font.render(
-            f"Bullets: [{self.ship.cur_bullets} / {UserStats.max_bullets}] "
-            + ("|" * self.ship.cur_bullets),
+            f'Bullets: [{self.ship.cur_bullets} / {UserStats.max_bullets}] '
+            + ('|' * self.ship.cur_bullets),
             True,
             Colors.white,
         )
         bullets_text_reloading = self.font.render(
-            "Bullets: RELOADING...",
+            'Bullets: RELOADING...',
             True,
             Colors.red,
         )
@@ -196,12 +196,12 @@ class Game(AppComponent):
         if not self.ship.is_reloading:
             self.screen.blit(
                 bullets_text,
-                (10, Settings.screen_size_y - 50)
+                (10, Settings.screen_size_y - 50),
             )
         else:
             self.screen.blit(
                 bullets_text_reloading,
-                (10, Settings.screen_size_y - 50)
+                (10, Settings.screen_size_y - 50),
             )
 
 
@@ -211,7 +211,7 @@ class Game(AppComponent):
         UserStats.level = DefaultStats.level
         UserStats.max_bullets = DefaultStats.max_bullets
 
-        self.asteroids = []
+        self.asteroids.clear()
         self.asteroids_amount = Settings.asteroids_start_amount
         self.game_over = False
 

@@ -1,6 +1,6 @@
 from pygame import Surface
-from pygame.math import Vector2
 from pygame.draw import polygon
+from pygame.math import Vector2
 
 from components.game_objects.bullet import Bullet
 from components.game_objects.game_object import GameObject
@@ -23,7 +23,7 @@ class Ship(GameObject):
         self.last_reload_time: float = 0.0
         self.is_reloading: bool = False
 
-    def update(self, dt: float, time_now: float):
+    def update(self, dt: float, time_now: float) -> None:
         self.time_now = time_now
         self.angle += self.rotation_speed * dt
 
@@ -80,14 +80,13 @@ class Ship(GameObject):
         points = [
             Vector2(0, -self.radius),
             Vector2(-self.radius//2, self.radius),
-            Vector2(self.radius//2, self.radius)
+            Vector2(self.radius//2, self.radius),
         ]
 
         rotated_points = []
         for point in points:
             point.rotate_ip(self.angle)
-            point += self.position
-            rotated_points.append(point)
+            rotated_points.append(point + self.position)
 
         polygon(screen, (255, 255, 255), rotated_points)
 

@@ -1,13 +1,18 @@
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from pygame import Surface
+
+if TYPE_CHECKING:
+    from settings import AppEvents
 
 
 class AppComponent(ABC):
     @abstractmethod
     def __init__(self, screen: Surface) -> None:
+        self.screen = screen
         self.screen: Surface
-        self.event: str
+        self.event: AppEvents
         self.time_now: float
 
     @abstractmethod

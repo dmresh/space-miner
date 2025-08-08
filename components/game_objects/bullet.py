@@ -4,8 +4,8 @@ from pygame.math import Vector2
 
 from components.game_objects.game_object import GameObject
 from settings import (
-    Settings,
     Colors,
+    Settings,
 )
 
 

@@ -1,13 +1,15 @@
 from dataclasses import dataclass
+from enum import UNIQUE, Enum, auto, verify
 
 
-@dataclass
-class AppEvents:
-    go_to_the_game: str = 'go to the game'
-    go_to_main_menu: str = 'go to main menu'
-    go_to_pause_menu: str = 'go to pause menu'
-    go_to_shop_menu: str = 'go to shop menu'
-    quit_the_game: str = 'quit the game'
+@verify(UNIQUE)
+class AppEvents(Enum):
+    no_event = auto()
+    go_to_the_game = auto()
+    go_to_main_menu = auto()
+    go_to_pause_menu = auto()
+    go_to_shop_menu = auto()
+    quit_the_game = auto()
 
 
 @dataclass
@@ -16,7 +18,8 @@ class Settings:
     screen_size_y: int = 900
     screen_size: tuple[int, int] = screen_size_x, screen_size_y
     screen_center: tuple[int, int] = screen_size_x // 2, screen_size_y // 2
-    asteroids_start_amount: int = 1
+    asteroids_start_amount: int = 2
+    safe_distance: int = 100
 
 
 @dataclass

@@ -5,7 +5,7 @@ from settings import Settings
 
 
 class GameObject:
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: float, y: float) -> None:
         self.time_now: float = 0.0
         self.position: Vector2 = Vector2(x, y)
         self.velocity: Vector2 = Vector2(0, 0)
